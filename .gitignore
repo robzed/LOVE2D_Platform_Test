@@ -1,0 +1,24 @@
+# don't list build directories
+hawkthorn*
+Journey*
+love*
+*.app
+*.dmg
+PowerPC_version/
+Windows_versions/
+Platform.love
+*.zip
+*.deb
+
+# mac specific files
+*.mode1v3
+*.pbxuser
+
+# win specific files
+*.ncb
+*.suo
+*.user
+*.sdf
+*.opensdf
+
+
