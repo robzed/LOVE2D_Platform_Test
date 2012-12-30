@@ -9,6 +9,7 @@ Windows_versions/
 Platform.love
 *.zip
 *.deb
+Other_Love_Examples/
 
 # mac specific files
 *.mode1v3

@@ -192,7 +192,7 @@ def main():
 	make_love()
 	make_MacOSX("love.app", "platform_intel_mac")
 	make_MacOSX("PowerPC_version/love.app", "PowerPC_version/platform_ppc_mac")
-	make_Win("love-0.8.0-win-x86", "Windows_versions", "platform_x86_win")
+	make_Win("love-0.8.0-win-x86", "Windows_versions", "platform_x86_32bit_win")
 	make_Win("love-0.8.0-win-x64", "Windows_versions", "platform_x64_win")
 
 main()
