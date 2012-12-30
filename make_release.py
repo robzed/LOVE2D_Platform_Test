@@ -188,12 +188,21 @@ def make_Win(source, dest1, dest2):
 	
 	print "Finished Windows version", dest
 
+def make_Linux_Source(dest):
+	# finally zip it for distribution
+	file_list = "README platform_README.txt Platform.love"
+	xcmd("Pack distribution", "zip -r "+dest+".zip "+file_list, "zip failed")
+	xcmd(None, "unzip -l "+dest+".zip", "list failed")
+
+	print "Finished Linux and Source version", dest
+	
 def main():
 	make_love()
 	make_MacOSX("love.app", "platform_intel_mac")
 	make_MacOSX("PowerPC_version/love.app", "PowerPC_version/platform_ppc_mac")
 	make_Win("love-0.8.0-win-x86", "Windows_versions", "platform_x86_32bit_win")
 	make_Win("love-0.8.0-win-x64", "Windows_versions", "platform_x64_win")
+	make_Linux_Source("platform_source_and_Linux")
 
 main()
 
