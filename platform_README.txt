@@ -1,11 +1,11 @@
 "Platform"
 Written 27th December 2012, Rob Probin
-Copyright © 2012 Rob Probin
+Copyright (C) 2012 Rob Probin
 
 A trivial game/demo.
 
 Use left and right arrow keys - or A and D - to control the movement.
-
+Use up arrow or W or <space bar> to jump.
 
 ===================================
 Licenses, Copyrights, Authors, etc.

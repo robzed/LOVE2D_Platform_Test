@@ -164,7 +164,7 @@ def make_Win(source, dest1, dest2):
 
 	# copy the exe and add the love file onto the exe
 	print "copy love.exe and add love to exe"
-	command = "cat Platform.love "+source+"/love.exe > "+exe_name
+	command = "cat "+source+"/love.exe Platform.love  > "+exe_name
 	print(command)
 	exit_status = os.system(command)
 	if exit_status:

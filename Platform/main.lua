@@ -506,14 +506,14 @@ function love.keypressed(key, unicode)
 		new_direction = -1
 		new_movement = 1
 		last_movement_key = key
-	elseif (key == 'up' or key == ' ') then
+	elseif key == 'up' or key == ' ' or key == 'w' then
 		new_player_jumping = true
 	end
 end
 
 -- This function is called whenever a keyboard key is released and receives the key that was released. You can have this function together with love.keypressed or separate, they aren't connected in any way.
 function love.keyreleased(key, unicode)
-	if key == 'up' or key == ' ' then
+	if key == 'up' or key == ' ' or key == 'w' then
 		new_player_jumping = false
 	elseif key == last_movement_key then
 		new_movement = 0
