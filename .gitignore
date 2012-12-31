@@ -10,6 +10,7 @@ Platform.love
 *.zip
 *.deb
 Other_Love_Examples/
+Others_Graphics/
 
 # mac specific files
 *.mode1v3

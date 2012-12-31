@@ -23,18 +23,35 @@
 -- Examples of flip-sceen http://www.giantbomb.com/flip-screen/92-2123/
 --
 -- SpriteBatch tile based on https://love2d.org/wiki/Tutorial:Efficient_Tile-based_Scrolling
-
+--
+--
+-- There are plenty of OO libraries for Lua
+--  - E.g.
+--		http://lua-users.org/wiki/ObjectOrientedProgramming
+--		https://love2d.org/wiki/30log
+--		https://love2d.org/wiki/32_lines_of_goodness
+--		http://www.troubleshooters.com/codecorn/lua/luaoop.htm
+--
+--	- MiddleClass looks ok: 
+--		- https://github.com/kikito/middleclass
+--		- https://love2d.org/wiki/MiddleClass 
+--		- https://github.com/kikito/middleclass/wiki
+--		- https://love2d.org/forums/viewtopic.php?f=5&t=1053
+--		- https://love2d.org/forums/viewtopic.php?f=5&t=1053&p=36979
+--		- This message made me happy when printing an instance "instance of class MapManager"
+--
+-- This looks interesting: https://github.com/kikito
+--		- https://github.com/kikito/stateful.lua
+--		- https://github.com/kikito/bump.lua
+--		- 
 
 -- TO DO
 --
--- * PowerPC Audio broken
--- * Johnny got a out of bounds crash?!?!
--- * tidy up this mess of hacky code and make into seperate source files (modules)
+-- * tidy up this mess of hacky code and make into separate source files (modules)
 -- * New room at top
 
-
-local map -- stores tiledata
-local mapWidth, mapHeight -- width and height in tiles
+require("game_scripts.map_manager")		-- https://love2d.org/wiki/require
+require("game_scripts.object_control_block_manager")
 
 local mapX, mapY -- view x,y in tiles. can be a fractional value like 3.25.
 
@@ -45,89 +62,11 @@ local tileSize -- size of tiles in pixels
 local tileQuads = {} -- parts of the tileset used for different tiles
 local tilesetSprite
 
-local characterImage
-local characterQuads = {}
+characterImage = nil
+characterQuads = {}
 
-wallValue = 2
+local wallValue = 2
 
-
-
-
-init_map = { 
---              11111111112222222222333
---     12345678901234567890123456789012
-	"---------------------------  ---", -- 1
-	"-                              -", -- 2
-	"-                              -", -- 3
-	"-     -------  -----------------", -- 4
-	"-                              -", -- 5
-	"-                              -", -- 6
-	"-             --               -", -- 7
-	"-              ---             -", -- 8
-	"-    ------                    -", -- 9
-	"-         --          ----     -", -- 10
-	"-             ---    -         -", -- 11
-	"-  --------                    -", -- 12
-	"-                              -", -- 13
-	"-             ------------     -", -- 14
-	"-                              -", -- 15
-	"-                           ----", -- 16
-	"-                  -------     -", -- 17
-	"-                              -", -- 18
-	"-                              -", -- 19
-	"-          ---------           -", -- 20
-	"-                              -", -- 21
-	"-                     ----     -", -- 22
-	"-           ----------         -", -- 23
-	"--------------------------------" -- 24
-}
---
-function setup_map()
-	mapWidth = screenWidth / tileSize
-	mapHeight = screenHeight / tileSize
-
-	map = {}
-	
-	-- random stuff in the map
-	for x = 1, mapWidth do
-		map[x] = {}
-		for y=1,mapHeight do
-			--local k = math.random(0,3)
-			--if k ~= wallValue then
-			--	k = 0
-			--end
-			local c = init_map[y]:sub(x, x)
-			local k = 0
-			if c == "-" then
-				k = wallValue
-			elseif c == nil then
-				k = wallValue
-			end
-			map[x][y] = k
-		end
-	end
-
-
-	--[[
-	-- bottom and top border
-	for x = 1, mapWidth do
-		map[x][1] = wallValue
-		map[x][mapHeight] = wallValue
-	end
-	
-	-- left and right border
-	for y = 1, mapWidth do
-		map[1][y] = wallValue
-		map[mapWidth][y] = wallValue
-	end
-	]]
-	
-	-- ensure start position is clear
-	map[2][mapHeight-1] = 0
-	map[2][mapHeight-2] = 0
-	map[3][mapHeight-1] = 0
-	map[3][mapHeight-2] = 0
-end
 
 --
 function setup_view()
@@ -171,7 +110,8 @@ function updateTilesetBatch()
   tilesetBatch:clear()
   for x=0, tilesDisplayWidth-1 do
     for y=0, tilesDisplayHeight-1 do
-      tilesetBatch:addq(tileQuads[map[x+mapX][y+mapY]], x*tileSize, y*tileSize)
+		print(map:get(x+mapX, y+mapY), x, y, mapX, mapY)
+      tilesetBatch:addq(tileQuads[map:get(x+mapX, y+mapY)], x*tileSize, y*tileSize)
     end
   end
 end
@@ -201,7 +141,16 @@ function setup_character_image()
 	fall_accumulated_time = 0
 	
 	player_x = 1.5 * tileSize
-	player_y = return_floor_below((mapHeight-1) * tileSize)-character_height
+	player_y = return_floor_below((tilesDisplayHeight-1) * tileSize)-character_height
+	
+	-- ensure start position is clear
+	local floor_x = math.floor(player_x)
+	local floor_y = math.floor(player_y)
+	map:set(floor_x, floor_y, 1)
+	map:set(floor_x, floor_y-1, 1)
+	map:set(floor_x+1, floor_y, 1)
+	map:set(floor_x+1, floor_y-1, 1)
+	
 	player_jumping = false
 	new_player_jumping = false
 	player_jump_count = 0
@@ -219,21 +168,36 @@ function love.load()
 
 	tileSize = 32
 
-	setup_map()
+	map = MapManager:new(screenWidth / tileSize, screenHeight / tileSize, 0, wallValue)
+
+	local room_objects_list = map:get_object_list()
+	ocb = ObjectControlBlockManager:new(room_objects_list)
+	
 	setup_view()
 	setup_tileset()
 	setup_character_image()
 	love.graphics.setFont(love.graphics.newFont(12))
 	setup_sound()
+	
+	
+	max_fall_speed_per_second = -300	-- going down is negative
+	fall_acceleration = -350
+
+	jump_speed_per_second = 300		-- +ve is going up
+	player_vertical_speed = 0		-- start at zero
+
+	max_jump_height = 100
+	current_jump_height = 0
+	movement_speed_per_second = 100
+	max_jump_distance_per_step = tileSize / 2
+	max_fall_distance_per_step = -tileSize / 2
 end
+
 
 function point_in_wall(x,y)
 	x = math.floor(x / tileSize + 1)
 	y = math.floor(y / tileSize + 1)
-	if x < 1 or x > #map then
-		return false
-	end
-	if map[x][y] == wallValue then
+	if map:get(x, y) == wallValue then
 		return true
 	end
 	
@@ -255,15 +219,6 @@ function return_floor_below(y)
 end
 
 
-max_fall_speed_per_second = -300	-- going down is negative
-fall_acceleration = -350
-
-jump_speed_per_second = 300		-- +ve is going up
-player_vertical_speed = 0		-- start at zero
-
-max_jump_height = 100
-current_jump_height = 0
-movement_speed_per_second = 100
 
 function move_player(time_step)
 
@@ -291,6 +246,12 @@ function move_player(time_step)
 	
 	-- now we want to calculate the distance we've travelled in this time_step
 	local distance_delta = (player_vertical_speed*time_step)
+	if distance_delta > max_jump_distance_per_step then
+		distance_delta = max_jump_distance_per_step
+	elseif distance_delta < max_fall_distance_per_step then
+		distance_delta = max_fall_distance_per_step
+	end
+	
 	local temp_player_y = player_y - distance_delta
 	-- calculate some flags for clarity
 	local going_down = distance_delta < 0
@@ -368,6 +329,17 @@ function move_player(time_step)
 		end
 	end
 	
+	-- exit room?
+	if player_y < 0 then
+		map:switch_maps()
+		updateTilesetBatch()
+		player_y = player_y + screenHeight - tileSize
+	elseif player_y >= screenHeight then
+		map:switch_maps()
+		updateTilesetBatch()
+		player_y = player_y - screenHeight + tileSize
+	end
+
 end
 
 
@@ -387,9 +359,11 @@ sound_fall_on = false
 sound_jump_on = false
 
 function setup_sound()
-	sound_fall = love.audio.newSource("media/fall1.wav", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound 
+	--sound_fall = love.audio.newSource("media/fall1.wav", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound 
+	sound_fall = love.audio.newSource("media/fall1.ogg", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound 
 	sound_fall:setVolume(0.3)
-	sound_jump = love.audio.newSource("media/jump1.wav", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound 
+	--sound_jump = love.audio.newSource("media/jump1.wav", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound 
+	sound_jump = love.audio.newSource("media/jump1.ogg", "static") -- the "static" tells LÖVE to load the file into memory, good for short sound 
 end
 
 function play_sound(sound)
@@ -425,7 +399,7 @@ function love.update(dt)
 	if gameIsPaused then return end
 	
 	move_player(dt)
-
+	ocb:update(dt)
 end
 
 -- love.draw is where all the drawing happens (if that wasn't obvious enough 
@@ -442,6 +416,7 @@ function love.draw()
 	--end
 	
 	love.graphics.draw(tilesetBatch)
+	ocb:draw()
 	draw_character()
 	love.graphics.print("FPS: "..love.timer.getFPS(), 10, 20)
 end
@@ -520,4 +495,36 @@ function love.keyreleased(key, unicode)
 	end
 end
 
+_credits = 
+{
+	":::People:::",
+
+	":Design:",
+	"Rob Probin",
+
+	":Graphics:",
+	"",
+
+	":Code:",
+	"Rob Probin",
+
+	":Additional and Library Code:",
+	
+	
+	
+	":::Tools:::",
+	-- program name, author, web link
+
+	":Sound Effects:",
+	"cfxr - Third Cog Software/Joachim Bengtsson's Mac port of DrPetter's sfxr. http://thirdcog.eu/apps/cfxr",
+	"Audacity - http://audacity.sourceforge.net",
+
+	":Graphics:",
+	"",
+	"Graphic Converter - http://www.lemkesoft.com/content/188/graphicconverter.html",
+}
+
+function get_credits()
+	
+end
 
