@@ -151,7 +151,7 @@ function MapManager:_load_named(map_name)
 			if c == "-" or c == nil then
 				k = self._wall_value
 			end
-			print(x, y, k)
+			--print(x, y, k)
 			self._map[x][y] = k
 		end
 	end

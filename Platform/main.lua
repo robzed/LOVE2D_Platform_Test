@@ -105,13 +105,15 @@ function setup_tileset()
   updateTilesetBatch()
 end
 
--- We only wish to add to the SpriteBatch the tiles that are presently visible. To do this, we make a function that updates the tileset and call it whenever the map focus changes. We also call it once in the initialization.
+-- We only wish to add to the SpriteBatch the tiles that are presently visible. 
+-- To do this, we make a function that updates the tileset and call it whenever 
+-- the map focus changes. We also call it once in the initialization.
 function updateTilesetBatch()
   tilesetBatch:clear()
   for x=0, tilesDisplayWidth-1 do
     for y=0, tilesDisplayHeight-1 do
-		print(map:get(x+mapX, y+mapY), x, y, mapX, mapY)
-      tilesetBatch:addq(tileQuads[map:get(x+mapX, y+mapY)], x*tileSize, y*tileSize)
+        --print(map:get(x+mapX, y+mapY), x, y, mapX, mapY)
+        tilesetBatch:add(tileQuads[map:get(x+mapX, y+mapY)], x*tileSize, y*tileSize)
     end
   end
 end
@@ -352,7 +354,7 @@ function draw_character()
 	else
 		animation = animation_step + 4
 	end
-	love.graphics.drawq(characterImage, characterQuads[animation], player_x, player_y)
+	love.graphics.draw(characterImage, characterQuads[animation], player_x, player_y)
 end
 
 sound_fall_on = false
