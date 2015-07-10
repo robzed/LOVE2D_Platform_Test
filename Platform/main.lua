@@ -50,6 +50,16 @@
 -- * tidy up this mess of hacky code and make into separate source files (modules)
 -- * New room at top
 
+if arg and arg[2] == "-debug" then
+    require('mobdebug').start() -- http://studio.zerobrane.com/doc-remote-debugging.html
+end
+
+local version_type = "Standard Lua"
+if type(jit) == 'table' then
+    version_type = (jit.version)  --LuaJIT 2.0.2
+end
+print(_VERSION, version_type, "Using Love2D:", love._version)
+
 require("game_scripts.map_manager")		-- https://love2d.org/wiki/require
 require("game_scripts.object_control_block_manager")
 
