@@ -8,6 +8,8 @@ It's basically a two-level flip-screen platformer with no mobs or objects.
 Use left and right arrow keys - or A and D - to control the movement.
 Use up arrow or W or <space bar> to jump.
 
+Slightly more info here: http://robprobin.com/pmwiki.php?n=Main.Platform
+
 Licenses, Copyrights, Authors, etc.
 ===================================
 The game/demo source file is written by me (with help from a tutorial) and covered under the GPLv2. 
